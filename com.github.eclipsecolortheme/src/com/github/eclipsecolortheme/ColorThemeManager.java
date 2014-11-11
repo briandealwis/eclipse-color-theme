@@ -1,6 +1,20 @@
 package com.github.eclipsecolortheme;
 
-import static com.github.eclipsecolortheme.ColorThemeKeys.*;
+import static com.github.eclipsecolortheme.ColorThemeKeys.BACKGROUND;
+import static com.github.eclipsecolortheme.ColorThemeKeys.CURRENT_LINE;
+import static com.github.eclipsecolortheme.ColorThemeKeys.DEBUG_CURRENT_INSTRUCTION_POINTER;
+import static com.github.eclipsecolortheme.ColorThemeKeys.DEBUG_SECONDARY_INSTRUCTION_POINTER;
+import static com.github.eclipsecolortheme.ColorThemeKeys.FIELD;
+import static com.github.eclipsecolortheme.ColorThemeKeys.FOREGROUND;
+import static com.github.eclipsecolortheme.ColorThemeKeys.JAVADOC;
+import static com.github.eclipsecolortheme.ColorThemeKeys.JAVADOC_KEYWORD;
+import static com.github.eclipsecolortheme.ColorThemeKeys.JAVADOC_LINK;
+import static com.github.eclipsecolortheme.ColorThemeKeys.JAVADOC_TAG;
+import static com.github.eclipsecolortheme.ColorThemeKeys.LOCAL_VARIABLE;
+import static com.github.eclipsecolortheme.ColorThemeKeys.METHOD;
+import static com.github.eclipsecolortheme.ColorThemeKeys.MULTI_LINE_COMMENT;
+import static com.github.eclipsecolortheme.ColorThemeKeys.OCCURRENCE_INDICATION;
+import static com.github.eclipsecolortheme.ColorThemeKeys.WRITE_OCCURRENCE_INDICATION;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -241,12 +255,22 @@ public class ColorThemeManager {
      * @param theme The name of the color theme to apply.
      */
     public void applyTheme(String theme) {
+		applyTheme(themes.get(theme));
+	}
+
+	/**
+	 * Changes the preferences of other plugins to apply the color theme.
+	 * 
+	 * @param theme
+	 *            the color theme to apply; may be {@code null}
+	 */
+	public void applyTheme(ColorTheme theme) {
         for (ThemePreferenceMapper editor : editors.values()) {
             editor.clear();
-            if (themes.get(theme) != null)
-                editor.map(themes.get(theme).getEntries(),
-                           themes.get(theme).getMappings() == null ?
-                               null : themes.get(theme).getMappings().get(editor.getPluginId()));
+			if (theme != null)
+				editor.map(theme.getEntries(),
+						theme.getMappings() == null ? null : theme
+								.getMappings().get(editor.getPluginId()));
 
             try {
                 editor.flush();

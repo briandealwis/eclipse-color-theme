@@ -4,14 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.CharConversionException;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -32,16 +28,14 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPreferencePage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 
 import com.github.eclipsecolortheme.Activator;
 import com.github.eclipsecolortheme.ColorTheme;
+import com.github.eclipsecolortheme.ColorThemeApplicator;
 import com.github.eclipsecolortheme.ColorThemeManager;
 
 /** The preference page for managing color themes. */
@@ -201,48 +195,14 @@ public class ColorThemePreferencePage extends PreferencePage
 
     @Override
     public boolean performOk() {
-        IWorkbenchPage activePage = PlatformUI.getWorkbench()
-                                              .getActiveWorkbenchWindow()
-                                              .getActivePage();
-
-        try {
-            java.util.List<IEditorReference> editorsToClose =
-                new ArrayList<IEditorReference>();
-            Map<IEditorInput, String> editorsToReopen =
-                new HashMap<IEditorInput, String>();
-            for (IEditorReference editor : activePage.getEditorReferences()) {
-                String id = editor.getId();
-                /*
-                 * C++ editors are not closed/reopened because it messes their
-                 * colors up.
-                 * TODO: Make this configurable in the mapping file.
-                 */
-                if (!id.equals("org.eclipse.cdt.ui.editor.CEditor")) {
-                    editorsToClose.add(editor);
-                    editorsToReopen.put(editor.getEditorInput(), id);
-                }
-            }
-
-            if (!editorsToClose.isEmpty()) {
-                if (!MessageDialog.openConfirm(getShell(), "Reopen Editors",
-                    "In order to change the color theme, some editors have to be closed and reopened.")) {
-                    return false;
-                }
-
-                activePage.closeEditors(editorsToClose.toArray(
-                    new IEditorReference[editorsToClose.size()]), true);
-            }
-
-            if (themeSelectionList.getSelectionCount() > 0) {
-                String selectedThemeName = themeSelectionList.getSelection()[0];
-                getPreferenceStore().setValue("colorTheme", selectedThemeName);
-                getPreferenceStore().setValue("forceDefaultBG", forceDefaultBG.getSelection());
-                colorThemeManager.applyTheme(selectedThemeName);
-                for (IEditorInput editorInput : editorsToReopen.keySet())
-                    activePage.openEditor(editorInput, editorsToReopen.get(editorInput));
-            }
-
-        } catch (PartInitException e) {
+		try {
+			if (themeSelectionList.getSelectionCount() > 0) {
+				String selectedThemeName = themeSelectionList.getSelection()[0];
+				new ColorThemeApplicator(PlatformUI.getWorkbench(),
+						colorThemeManager).apply(selectedThemeName,
+						forceDefaultBG.getSelection());
+			}
+		} catch (WorkbenchException e) {
             // TODO: Show a proper error message (StatusManager).
             e.printStackTrace();
         }

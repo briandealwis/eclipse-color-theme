@@ -9,6 +9,7 @@
 
 	<modules>
 		<module>com.github.eclipsecolortheme</module>
+		<module>com.github.eclipsecolortheme.css</module>
 		<module>com.github.eclipsecolortheme.feature</module>
 		<module>com.github.eclipsecolortheme.test</module>
 		<module>com.github.eclipsecolortheme.updatesite</module>

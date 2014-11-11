@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="com.github.eclipsecolortheme.mapper" name="Editor Mapping" schema="schema/com.github.eclipsecolortheme.mapper.exsd"/>
+   <extension-point id="com.github.eclipsecolortheme.theme" name="Eclipse Color Theme" schema="schema/com.github.eclipsecolortheme.theme.exsd"/>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="com.github.eclipsecolortheme.css.WorkbenchInstaller">
+      </startup>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.core.elementProvider">
+      <provider
+            class="com.github.eclipsecolortheme.css.engine.WorkbenchElementProvider">
+         <widget
+               class="org.eclipse.ui.IWorkbench">
+         </widget>
+      </provider>
+   </extension>
+   <extension
+         point="org.eclipse.e4.ui.css.core.propertyHandler">
+      <handler
+            adapter="com.github.eclipsecolortheme.css.engine.WorkbenchElement"
+            handler="com.github.eclipsecolortheme.css.engine.WorkbenchThemePropertyHandler">
+         <property-name
+               name="eclipse-color-theme">
+         </property-name>
+      </handler>
+   </extension>
+
+
+</plugin>
